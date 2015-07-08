@@ -101,6 +101,7 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="ConnexCcLock.cs" />
+    <Compile Include="Controllers\FieldMaxController.cs" />
     <Compile Include="Controllers\MotionStateController.cs" />
     <Compile Include="Controllers\PositionController.cs" />
     <Compile Include="Controllers\WavelengthController.cs" />

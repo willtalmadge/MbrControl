@@ -14,8 +14,6 @@ using MbrControl.Models;
 
 namespace MbrControl.Controllers
 {
-    
-
     [RoutePrefix("api/wavelength")]
     public class WavelengthController : ApiController
     {

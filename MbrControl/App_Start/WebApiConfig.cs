@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using System.Net.Http.Headers;
+using MbrControl.Controllers;
+using System.Text;
+using System.Diagnostics;
 
 namespace MbrControl
 {
@@ -21,6 +24,11 @@ namespace MbrControl
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
+            Debug.WriteLine("Single Measurement");
+            Debug.WriteLine(FieldMaxController.SingleMeasurement());
+            FieldMaxController.SetWavelengthCorrection(700);
+            
         }
     }
 }
