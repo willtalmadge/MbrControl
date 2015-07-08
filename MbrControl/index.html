@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+    <div>
+        <h2>Motion State</h2>
+        <p id="motion_state"></p>
+        <p id="current_position"></p>
+    </div>
+    <div>
+        <h2>Set position in mm</h2>
+        <input type="text" id="position" size="5" />
+        <input type="button" value="Move" onclick="move();" />
+    </div>
+    <div id="wavelength_control" hidden="hidden">
+        <h2>Set wavelength in nm</h2>
+        <input type="text" id="wavelength" size="5"/>
+        <input type="button" value="Go" onclick="set_wavelength();"/>
+    </div>
+    <div>
+        <h2>Calibration</h2>
+        <p id="calibration_state"></p>
+        <input type="button" value="Calibrate" onclick="do_calibration();"/>
+    </div>
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            doMotionStatePoll();
+            do_calibration_state_poll();
+        });
+        function doMotionStatePoll() {
+            $.get('api/motionstate')
+                .done(function (data) {
+                    $('#motion_state').text(data);
+            });
+            $.get('api/position')
+                .done(function (data) {
+                    $('#current_position').text(data);
+            });
+            setTimeout(doMotionStatePoll, 1000);
+        }
+        function move() {
+            var pos = $('#position').val();
+            $.get('api/position/' + pos + '/');
+        }
+        function set_wavelength() {
+            var w = $('#wavelength').val();
+            $.get('api/wavelength/' + w + '/');
+        }
+        function do_calibration() {
+            $.get('api/wavelength/calibrate');
+        }
+        function do_calibration_state_poll() {
+            $.getJSON('api/wavelength/calibration')
+                .done(function (data) {
+                    if (data.State == 'Calibrated') {
+                        $('#wavelength_control').show(100);
+                    } else {
+                        $('#wavelength_control').hide(100);
+                    }
+                    $('#calibration_state').text(JSON.stringify(data));
+                });
+            setTimeout(do_calibration_state_poll, 1000);
+        }
+    </script>
+</body>
+</html>

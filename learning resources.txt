@@ -1,0 +1,8 @@
+Resources that help understanding this project
+
+Web service
+http://www.asp.net/web-api/overview/getting-started-with-aspnet-web-api/tutorial-your-first-web-api
+http://www.asp.net/web-api/overview/web-api-routing-and-actions/attribute-routing-in-web-api-2
+
+web page
+https://learn.jquery.com/using-jquery-core/working-with-selections/
