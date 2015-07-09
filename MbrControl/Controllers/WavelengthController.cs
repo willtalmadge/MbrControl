@@ -18,9 +18,9 @@ namespace MbrControl.Controllers
     public class WavelengthController : ApiController
     {
         static string base_path = "C:\\Users\\labuser\\Dropbox\\Data";
-        static double calibration_start = 10.0;
-        static double calibration_end = 20.0;
-        static int calibration_points = 10;
+        static double calibration_start = 5.0;
+        static double calibration_end = 23.0;
+        static int calibration_points = 20;
 
         string PathForDay()
         {
@@ -56,6 +56,23 @@ namespace MbrControl.Controllers
             StreamReader reader = new StreamReader(response.GetResponseStream());
             string wavelength = reader.ReadToEnd();
             return Convert.ToDouble(wavelength);
+        }
+        public static void CalibrateWavelengthForPosition(Vector<double> z, Vector<double> w)
+        {
+            Tuple<double, double> fit = Fit.Line(z.ToArray(), w.ToArray());
+            var model = z * fit.Item2 + fit.Item1;
+            var dif = model - w;
+            double rms = Math.Sqrt(dif.DotProduct(dif) / (calibration_points + 1));
+            WebApiApplication.calibration.Slope = fit.Item2;
+            WebApiApplication.calibration.Intercept = fit.Item1;
+            WebApiApplication.calibration.State = MbrCalibration.Calibrated;
+            WebApiApplication.calibration.RmsError = rms;
+        }
+        [Route("wavelength_at_max")]
+        [HttpGet]
+        public IHttpActionResult WavelengthAtMax()
+        {
+            return Ok(GetLightfieldWavelength());
         }
         [Route("{targetWavelength_nm:double}")]
         [HttpGet]
@@ -118,20 +135,40 @@ namespace MbrControl.Controllers
 
                             w[i] = Convert.ToDouble(wavelength);
                         }
-                        Tuple<double, double> fit = Fit.Line(z.ToArray(), w.ToArray());
-                        var model = z*fit.Item2 + fit.Item1;
-                        var dif = model - w;
-                        double rms = Math.Sqrt(dif.DotProduct(dif)/(calibration_points+1));
-                        WebApiApplication.calibration.Slope = fit.Item2;
-                        WebApiApplication.calibration.Intercept = fit.Item1;
-                        WebApiApplication.calibration.State = MbrCalibration.Calibrated;
-                        WebApiApplication.calibration.RmsError = rms;
+                        CalibrateWavelengthForPosition(z, w);
                     }
+                    WebApiApplication.calibration.CalibrationFile = path;
                 };
 
             HostingEnvironment.QueueBackgroundWorkItem(asyncTask);
 
             return Ok("Calibrating");
+        }
+        [Route("calibrate/file")]
+        [HttpPost]
+        public IHttpActionResult CalibrateFromFile([FromBody] string path)
+        {
+            using (StreamReader file = new StreamReader(path))
+            {
+                //Discard the header line
+                file.ReadLine();
+
+                string line;
+                var V = Vector<double>.Build;
+                var z = V.Dense(calibration_points + 1);
+                var w = V.Dense(calibration_points + 1);
+                int i = 0;
+                while ((line = file.ReadLine()) != null)
+                {
+                    string [] elements = line.Split(',');
+                    z[i] = Convert.ToDouble(elements[0]);
+                    w[i] = Convert.ToDouble(elements[1]);
+                    i++;
+                }
+                CalibrateWavelengthForPosition(z, w);
+            }
+            WebApiApplication.calibration.CalibrationFile = path;
+            return Ok("Calibrated from file");
         }
         [Route("is_calibrated")]
         [HttpGet]
