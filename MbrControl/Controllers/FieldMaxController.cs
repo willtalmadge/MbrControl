@@ -23,6 +23,21 @@ namespace MbrControl.Controllers
         [DllImport("C:\\Windows\\SysWOW64\\FieldMax2Lib.dll", CharSet = CharSet.Ansi)]
         public static extern UInt16 fm2LibPackagedSendReply(Int32 h, String command, StringBuilder returnBuffer, ref Int16 size);
 
+        private static object lockObj = new Object();
+        static public void DoJobLock(Action<Int32, string> job)
+        {
+            lock (lockObj)
+            {
+                Int32 h = fm2LibOpenDriver(0);
+
+                StringBuilder SerialNumber = new StringBuilder();
+                Int16 i = 16;
+                FieldMaxController.fm2LibGetSerialNumber(h, SerialNumber, ref i);
+                job(h, SerialNumber.ToString());
+                fm2LibCloseDriver(h);
+            }
+        }
+
         static public Int32 OpenDriver()
         {
             //TODO: place into a lock
