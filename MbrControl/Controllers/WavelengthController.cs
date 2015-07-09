@@ -50,6 +50,13 @@ namespace MbrControl.Controllers
                 extension
                 );
         }
+        public static double GetLightfieldWavelength()
+        {
+            WebResponse response = WebRequest.Create("http://192.168.1.87:5000/wavelength_at_max").GetResponse();
+            StreamReader reader = new StreamReader(response.GetResponseStream());
+            string wavelength = reader.ReadToEnd();
+            return Convert.ToDouble(wavelength);
+        }
         [Route("{targetWavelength_nm:double}")]
         [HttpGet]
         public IHttpActionResult GotoWavelength(double targetWavelength_nm)

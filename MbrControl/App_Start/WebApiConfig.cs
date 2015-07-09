@@ -24,10 +24,6 @@ namespace MbrControl
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
-
-            Debug.WriteLine("Single Measurement");
-            Debug.WriteLine(FieldMaxController.SingleMeasurement());
-            FieldMaxController.SetWavelengthCorrection(700);
             
         }
     }

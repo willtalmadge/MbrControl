@@ -6,3 +6,9 @@ http://www.asp.net/web-api/overview/web-api-routing-and-actions/attribute-routin
 
 web page
 https://learn.jquery.com/using-jquery-core/working-with-selections/
+
+To access this server from devices in the lab, it is necessary to 
+make the modification found here
+http://stackoverflow.com/questions/14725455/connecting-to-visual-studio-debugging-iis-express-server-over-the-lan
+
+Then run VS2013 in administrator mode.

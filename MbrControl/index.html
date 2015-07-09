@@ -20,9 +20,15 @@
         <input type="button" value="Go" onclick="set_wavelength();"/>
     </div>
     <div>
-        <h2>Calibration</h2>
+        <h2>Micrometer Calibration</h2>
         <p id="calibration_state"></p>
         <input type="button" value="Calibrate" onclick="do_calibration();"/>
+    </div>
+    <div>
+        <h2>Power Control</h2>
+        <input type="number" id="power_set_point" size="5"/>
+        <input type="button" value="Goto Set Point" onclick="goto_set_point();"/>
+        <p id="power_control_status"></p>
     </div>
     <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
     <script>
@@ -63,6 +69,16 @@
                     $('#calibration_state').text(JSON.stringify(data));
                 });
             setTimeout(do_calibration_state_poll, 1000);
+        }
+        function goto_set_point() {
+            var p_uw = parseFloat($('#power_set_point').val())
+            var p_w = p_uw*1e-6;
+            $('#power_control_status').text('Hunting for power...');
+            $.get('api/power/set_power_bisection/' + p_w.toString() + '/')
+                .done(function () {
+                    $('#power_control_status').text("Found set point");
+                });
+            
         }
     </script>
 </body>

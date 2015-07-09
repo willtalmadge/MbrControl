@@ -25,6 +25,7 @@ namespace MbrControl.Controllers
 
         static public Int32 OpenDriver()
         {
+            //TODO: place into a lock
             var h = fm2LibOpenDriver(0);
 
             StringBuilder SerialNumber = new StringBuilder();
