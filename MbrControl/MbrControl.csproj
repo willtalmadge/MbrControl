@@ -120,7 +120,7 @@
     </Compile>
     <Compile Include="Models\MbrCalibration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TimestampTools.cs" />
+    <Compile Include="TimestampFileTools.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
