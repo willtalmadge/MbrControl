@@ -15,12 +15,14 @@ namespace MbrControl.Models
         public double Slope { get; set; }
         public double Intercept { get; set; }
         public double RmsError { get; set; }
+        public string CalibrationFile { get; set; }
 
         public MbrCalibration()
         {
             State = MbrCalibration.NotCalibrated;
             Slope = Double.NaN;
             Intercept = Double.NaN;
+            CalibrationFile = "";
         }
         public bool IsCalibrated()
         {
