@@ -16,7 +16,7 @@ namespace MbrControl.Controllers
     [RoutePrefix("api/power")]
     public class PowerController : ApiController
     {
-        static void BisectionControl(Action<double> variable_set, Func<double> process_read, 
+        static bool BisectionControl(Action<double> variable_set, Func<double> process_read, 
             double set_point, double low, double high, double tolerance)
         {
             double step = (high - low) / 2.0;
@@ -29,7 +29,7 @@ namespace MbrControl.Controllers
                 if (Math.Abs(new_value-set_point) <= tolerance)
                 {
                     //Found a suitable variable
-                    break;
+                    return true;
                 }
                 else
                 {
@@ -43,6 +43,10 @@ namespace MbrControl.Controllers
                         //Variable is too high, step down
                         step = -1.0 * Math.Abs(step / 2.0);
                     }
+                }
+                if (Math.Abs(step) <= (high-low)/1000.0)
+                {
+                    return false;
                 }
                 variable_target = variable_target + step;
             }
@@ -67,8 +71,14 @@ namespace MbrControl.Controllers
             double w = WavelengthController.GetLightfieldWavelength();
             FieldMaxController.SetWavelengthCorrection((int)Math.Floor(w));
             Thread.Sleep(2000);
-            BisectionControl(variable_set, process_read, power_watts, 0.0, 2.5, 0.5e-6);
-            return Ok("Power set point found within tolerance");
+            if (BisectionControl(variable_set, process_read, power_watts, 0.0, 2.5, 0.5e-6))
+            {
+                return Ok("Power set point found within tolerance");
+            }
+            else
+            {
+                return Ok("Failed to find set point");
+            }
         }
     }
 }

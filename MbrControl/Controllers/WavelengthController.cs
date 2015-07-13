@@ -59,12 +59,13 @@ namespace MbrControl.Controllers
         }
         public static void CalibrateWavelengthForPosition(Vector<double> z, Vector<double> w)
         {
-            Tuple<double, double> fit = Fit.Line(z.ToArray(), w.ToArray());
-            var model = z * fit.Item2 + fit.Item1;
+            double[] fit = Fit.Polynomial(z.ToArray(), w.ToArray(), 2);
+            var model = z.PointwiseMultiply(z)*fit[2] + z * fit[1] + fit[0];
             var dif = model - w;
             double rms = Math.Sqrt(dif.DotProduct(dif) / (calibration_points + 1));
-            WebApiApplication.calibration.Slope = fit.Item2;
-            WebApiApplication.calibration.Intercept = fit.Item1;
+            WebApiApplication.calibration.K0 = fit[0];
+            WebApiApplication.calibration.K1 = fit[1];
+            WebApiApplication.calibration.K2 = fit[2];
             WebApiApplication.calibration.State = MbrCalibration.Calibrated;
             WebApiApplication.calibration.RmsError = rms;
         }
@@ -79,7 +80,7 @@ namespace MbrControl.Controllers
         public IHttpActionResult GotoWavelength(double targetWavelength_nm)
         {
             if (WebApiApplication.calibration.IsCalibrated()) {
-                double target_z = (targetWavelength_nm - WebApiApplication.calibration.Intercept)/WebApiApplication.calibration.Slope;
+                double target_z = WebApiApplication.calibration.PositionForWavelength(targetWavelength_nm);
                 if (PositionController.TrySetPosition(target_z))
                 {
                     return Ok("Moving to wavelength");
