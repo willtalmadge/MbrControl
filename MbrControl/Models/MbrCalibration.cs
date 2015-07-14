@@ -23,6 +23,8 @@ namespace MbrControl.Models
             State = MbrCalibration.NotCalibrated;
             K0 = Double.NaN;
             K1 = Double.NaN;
+            K2 = Double.NaN;
+            RmsError = Double.NaN;
             CalibrationFile = "";
         }
         public bool IsCalibrated()
